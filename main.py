@@ -14,10 +14,10 @@ import numpy
 from func_timeout import func_set_timeout
 from func_timeout.exceptions import FunctionTimedOut
 
+from binary_search import binary_search
 from bogo_sort import bogo_sort
 from bubble_sort import bubble_sort
 from radix_sort import radix_sort
-from binary_search import binary_search
 
 
 def main():

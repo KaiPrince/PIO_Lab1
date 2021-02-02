@@ -4,7 +4,7 @@ A comparison of different sorting algorithms
 
 ## Results
 
-<< number of call / duration in seconds >>
+<< number of calls / duration in seconds >>
 
 #### Sort: Bogo Sort
 

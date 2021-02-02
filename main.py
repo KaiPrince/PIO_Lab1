@@ -9,8 +9,9 @@ import cProfile
 import io
 import pstats
 from typing import Callable
+import random
 
-import numpy
+from numpy.random import randint
 from func_timeout import func_set_timeout
 from func_timeout.exceptions import FunctionTimedOut
 
@@ -18,6 +19,8 @@ from binary_search import binary_search
 from bogo_sort import bogo_sort
 from bubble_sort import bubble_sort
 from radix_sort import radix_sort
+
+VERBOSE = False
 
 
 def main():
@@ -54,14 +57,17 @@ def setup_search_test(algorithm, size):
 
     sorted_test_data = radix_sort(test_data)
 
+    rand_item = random.choice(sorted_test_data)
+
     def run_func(data):
-        return algorithm(data, test_data[0])
+        return algorithm(data, rand_item)
 
     return (sorted_test_data, run_func)
 
 
 def get_test_data(size):
-    test_data = numpy.random.randint(0, 1000, size)
+    upper_bound = 1000
+    test_data = randint(0, upper_bound, size)
 
     return test_data
 
@@ -69,14 +75,19 @@ def get_test_data(size):
 def run_test(func, test_data):
     results = []
 
-    for _ in range(3):
+    numTrials = 3
+    for _ in range(numTrials):
         test_data_copy = test_data.copy()
 
-        @func_set_timeout(10)
+        timeout_in_seconds = 10
+
+        @func_set_timeout(timeout_in_seconds)
         def do_test():
             with cProfile.Profile() as profile:
                 profile.runcall(func, test_data_copy)
-                # profile.print_stats()
+
+                if VERBOSE:
+                    profile.print_stats()
 
                 s = io.StringIO()
                 ps = pstats.Stats(profile, stream=s)

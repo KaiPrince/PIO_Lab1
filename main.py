@@ -5,18 +5,15 @@
  * Date: Tue, Feb 02, 2021
  * Description: This program compares sorting algorithms.
 """
-import cProfile
-import io
-import pstats
+import time
 from typing import Callable
-
-import numpy
-from func_timeout import func_set_timeout
-from func_timeout.exceptions import FunctionTimedOut
-
 from bogo_sort import bogo_sort
 from bubble_sort import bubble_sort
 from radix_sort import radix_sort
+from func_timeout import func_set_timeout
+from func_timeout.exceptions import FunctionTimedOut
+import numpy
+import cProfile
 
 
 def main():
@@ -34,8 +31,12 @@ def main():
 def setup_test(algorithm, size):
     test_data = numpy.random.randint(0, 1000, size)
 
+    @func_set_timeout(10)
     def func():
-        return algorithm(test_data.copy())
+        with cProfile.Profile() as profile:
+            profile.runcall(algorithm, test_data.copy())
+
+        profile.print_stats()
 
     return func
 
@@ -43,26 +44,15 @@ def setup_test(algorithm, size):
 def run_test(func):
     results = []
     for _ in range(3):
+        start = time.process_time()
 
         try:
-            with cProfile.Profile() as profile:
-
-                @func_set_timeout(10)
-                def do_test():
-                    return profile.runcall(func)
-
-                do_test()
-
-                profile.print_stats()
-                s = io.StringIO()
-                ps = pstats.Stats(profile, stream=s)
-                ps.print_stats()
-
-            result = s.getvalue().split("\n")[0].strip()
+            func()
         except FunctionTimedOut:
-            result = "Test timed out."
+            print("Test timed out.")
             pass
 
+        result = time.process_time() - start
         results.append(result)
     return results
 

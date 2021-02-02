@@ -4,6 +4,8 @@ A comparison of different sorting algorithms
 
 ## Results
 
+<< number of call / duration in seconds >>
+
 #### Sort: Bogo Sort
 
 | Input                   | Trial 1          | Trial 2      | Trial 3       |

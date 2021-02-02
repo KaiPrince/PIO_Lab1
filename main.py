@@ -52,7 +52,6 @@ def setup_sort_test(algorithm, size):
 def setup_search_test(algorithm, size):
     test_data = get_test_data(size)
 
-    # Sort data before test
     sorted_test_data = radix_sort(test_data)
 
     def run_func(data):

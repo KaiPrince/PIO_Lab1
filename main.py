@@ -20,7 +20,8 @@ from bogo_sort import bogo_sort
 from bubble_sort import bubble_sort
 from radix_sort import radix_sort
 
-VERBOSE = False
+USE_CPROFILE = False
+VERBOSE = False  # Ignored if USE_CPROFILE is True
 
 
 def main():
@@ -72,7 +73,7 @@ def get_test_data(size):
     return test_data
 
 
-def run_test(func, test_data):
+def run_test(func: Callable, test_data):
     results = []
 
     numTrials = 3
@@ -83,17 +84,24 @@ def run_test(func, test_data):
 
         @func_set_timeout(timeout_in_seconds)
         def do_test():
-            with cProfile.Profile() as profile:
-                profile.runcall(func, test_data_copy)
+            result = ""
 
-                if VERBOSE:
-                    profile.print_stats()
+            if USE_CPROFILE:
+                cProfile.runctx("func(test_data_copy)", None, locals())
+            else:
+                with cProfile.Profile() as profile:
+                    profile.runcall(func, test_data_copy)
 
-                s = io.StringIO()
-                ps = pstats.Stats(profile, stream=s)
-                ps.print_stats()
+                    if VERBOSE:
+                        profile.print_stats()
 
-            return s.getvalue()
+                    s = io.StringIO()
+                    ps = pstats.Stats(profile, stream=s)
+                    ps.print_stats()
+
+                    result = s.getvalue()
+
+            return result
 
         try:
             output = do_test()
